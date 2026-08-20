@@ -1,0 +1,17 @@
+export function getSafeNextPath(value: unknown, fallback = "/") {
+  if (typeof value !== "string") {
+    return fallback;
+  }
+
+  const trimmed = value.trim();
+
+  if (!trimmed.startsWith("/") || trimmed.startsWith("//") || trimmed.includes("://")) {
+    return fallback;
+  }
+
+  return trimmed;
+}
+
+export function withNext(pathname: string, nextPath: string) {
+  return `${pathname}?next=${encodeURIComponent(nextPath)}`;
+}

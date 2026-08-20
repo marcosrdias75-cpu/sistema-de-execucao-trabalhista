@@ -1,0 +1,1 @@
+CREATE INDEX `idx_ai_analysis_runs_process_updated` ON `ai_analysis_runs` (`process_number`,`updated_at`);
