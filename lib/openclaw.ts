@@ -6,6 +6,7 @@ import { toProcessSlug } from "@/lib/seed-data";
 export interface OpenClawAnalysisPackage {
   analysis: CaseAnalysis;
   deadlines: ProcessDeadline[];
+  documents?: Array<{ documentId: string; name: string; markdown: string; sha256: string }>;
   edit: PilotEdit;
   pjeReferences: PjeReference[];
   pilotCase: PilotCase;
@@ -78,6 +79,12 @@ export function buildOpenClawPrompt(input: OpenClawAnalysisPackage) {
       reclamante: input.pilotCase.reclamante,
       valorBruto: formatCurrency(input.pilotCase.maxBrutoReclamante),
     },
+    documentosConvertidos: (input.documents ?? []).map((document) => ({
+      documentoId: document.documentId,
+      nome: document.name,
+      sha256: document.sha256,
+      conteudoMarkdown: document.markdown,
+    })),
     prazos: input.deadlines.map(compactDeadline),
     referenciasPJe: input.pjeReferences.map(compactPje),
   };
@@ -91,15 +98,28 @@ IMPORTANTE:
 - A resposta deve apoiar decisao humana, com revisao obrigatoria do advogado.
 
 Tarefa:
-1. Ler os dados abaixo.
-2. Explicar por que o processo e ou nao oportunidade de recuperacao/liberacao de credito.
-3. Identificar risco juridico e risco operacional.
-4. Sugerir proximos passos objetivos.
-5. Informar pontos que precisam de conferencia humana.
+1. Reconstruir a linha do tempo a partir do processo principal, processos vinculados, tres ultimos prazos, movimentacoes e documentos.
+2. Classificar fase, execucao, recursos, transitos e calculo sem usar somente palavras-chave.
+3. Separar fato, inferencia e estrategia. Toda conclusao deve citar documento/pagina/trecho ou evento.
+4. Reconstruir calculos, homologacoes, impugnacoes, garantias, pagamentos, alvaras e saldo, sem tratar garantia como pagamento nem alvara expedido como recebido.
+5. Identificar credito FGTS depositado pela reclamada e garantias de deposito quando houver.
+6. Explicar oportunidades, riscos e proximos passos, sempre sujeitos a revisao do advogado.
+7. Quando faltar prova, usar estado indeterminado/nao identificado e revisao necessaria.
 
 Responda em JSON puro, sem markdown, neste formato:
 {
   "resumoExecutivo": "texto curto",
+  "faseProcessual": {"status":"indeterminado","confianca":"nao_informada","eventosUsados":[],"evidencias":[]},
+  "execucao": {"status":"nao_identificada|provisoria|provavelmente_definitiva|definitiva","local":"indeterminado|processo_principal|processo_vinculado","confianca":"baixa|media|alta|nao_informada","eventosUsados":[],"evidencias":[]},
+  "recursos": {"status":"nao_identificado","confianca":"nao_informada","eventosUsados":[],"evidencias":[]},
+  "transitoConhecimento": {"status":"nao_identificado","confianca":"nao_informada","eventosUsados":[],"evidencias":[]},
+  "transitoExecucao": {"status":"nao_identificado","confianca":"nao_informada","eventosUsados":[],"evidencias":[]},
+  "calculo": {"status":"nao_identificado","valorAtual":null,"valorEstabilizado":null,"valorQuestionado":null,"saldo":null,"confianca":"nao_informada","evidencias":[]},
+  "creditoFgts": {"status":"nao_identificado","valor":null,"depositadoPelaReclamada":null,"confianca":"nao_informada","evidencias":[]},
+  "garantias": [{"tipo":"deposito_recursal|deposito_judicial|sisbajud|seguro|fianca|penhora|outro","naturezaFinanceira":"garantia","valor":null,"data":null,"documentoId":null,"status":"indeterminado","utilizacao":"revisao_necessaria"}],
+  "pagamentos": [{"tipo":"pagamento|parcelamento|acordo|transferencia|outro","valor":null,"recebimentoComprovado":false,"evidencias":[]}],
+  "alvaras": [{"status":"determinado|expedido|disponibilizado|levantado|recebimento_comprovado|recebimento_nao_comprovado","valor":null,"beneficiario":null,"evidencias":[]}],
+  "eventosEstruturados": [{"tipo":"evento","data":null,"documentoId":null,"pagina":null,"trecho":null,"efeito":null,"confianca":"baixa|media|alta"}],
   "oportunidade": "texto curto",
   "riscoJuridico": "baixo|medio|alto",
   "riscoOperacional": "baixo|medio|alto",
@@ -134,6 +154,11 @@ function buildOpenClawCompactPrompt(input: OpenClawAnalysisPackage) {
     reclamante: input.pilotCase.reclamante,
     sinais: input.analysis.signals.map((signal) => signalLabels[signal] ?? signal),
     valorBruto: formatCurrency(input.pilotCase.maxBrutoReclamante),
+    documentos: (input.documents ?? []).slice(0, 2).map((document) => ({
+      id: document.documentId,
+      nome: document.name,
+      markdown: document.markdown.slice(0, 20_000),
+    })),
   };
 
   return `Analise juridicamente este processo trabalhista para recuperacao/liberacao de credito do Grupo Casas Bahia.
@@ -601,31 +626,4 @@ export async function dispatchOpenClawRun(input: {
     body: JSON.stringify({
       callback_url: input.callbackUrl,
       process_number: input.analysisPackage.pilotCase.processNumber,
-      process_url: input.processUrl,
-      prompt: input.prompt,
-      run_id: input.runId,
-      source: "sigrj",
-      task: "legal_credit_recovery_analysis",
-    }),
-    headers,
-    method: "POST",
-  });
-
-  if (!response.ok) {
-    return {
-      dispatched: false,
-      failureMessage: `OpenClaw respondeu ${response.status}.`,
-      status: "failed" as const,
-    };
-  }
-
-  return {
-    dispatched: true,
-    failureMessage: null,
-    status: "sent" as const,
-  };
-}
-
-export function getProcessPublicPath(processNumber: string) {
-  return `/processos/${toProcessSlug(processNumber)}`;
-}
+      pro

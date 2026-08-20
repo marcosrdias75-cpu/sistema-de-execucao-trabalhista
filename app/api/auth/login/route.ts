@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSession } from "@/lib/auth";
-import { sha256Digest, verifyCredential } from "@/lib/crypto";
+import { verifyCredential } from "@/lib/crypto";
 import { findUser } from "@/lib/database";
 import { getSafeNextPath, withNext } from "@/lib/navigation";
-import { initialUser } from "@/lib/seed-data";
 
 async function readLoginRequest(request: Request) {
   const contentType = request.headers.get("content-type") ?? "";
@@ -53,12 +52,7 @@ export async function POST(request: Request) {
   const matchesStoredHash = user
     ? await verifyCredential(password, user.password_hash)
     : false;
-  const matchesTemporaryKey =
-    Boolean(user?.must_change_password) &&
-    user.email === initialUser.email &&
-    (await sha256Digest(password)) === initialUser.temporaryKeyDigest;
-
-  if (!user || (!matchesStoredHash && !matchesTemporaryKey)) {
+  if (!user || !matchesStoredHash) {
     if (wantsRedirect) {
       return redirectTo(request, "/login?error=credentials");
     }
@@ -74,6 +68,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     mustChangePassword: Boolean(user.must_change_password),
-    redirectTo: user.must_change_password ? withNext("/trocar-chave", nextPath) : nextPath,
-  });
-}
+    redirectTo: user.must_change

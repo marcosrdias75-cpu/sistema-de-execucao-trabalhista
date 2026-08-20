@@ -5,8 +5,16 @@ import { findUser } from "@/lib/database";
 
 const cookieName = "sigrj_restrito_session";
 const sessionSeconds = 60 * 60 * 8;
-const sessionSecret =
-  "sigrj-restrito-2026-08-20-4f867b3c23a54792b495ef79a21f0fd2";
+
+function getSessionSecret() {
+  const value = process.env.SESSION_SECRET?.trim();
+
+  if (!value || value.length < 32) {
+    throw new Error("SESSION_SECRET deve ter pelo menos 32 caracteres.");
+  }
+
+  return value;
+}
 
 export interface SessionUser {
   email: string;
@@ -25,7 +33,7 @@ async function createCookieValue(email: string) {
     email,
     exp: Math.floor(Date.now() / 1000) + sessionSeconds,
   });
-  return `${payload}.${await signValue(payload, sessionSecret)}`;
+  return `${payload}.${await signValue(payload, getSessionSecret())}`;
 }
 
 async function readCookiePayload() {
@@ -38,7 +46,7 @@ async function readCookiePayload() {
 
   const [payload, signature] = cookieValue.split(".");
 
-  if (!payload || !signature || (await signValue(payload, sessionSecret)) !== signature) {
+  if (!payload || !signature || (await signValue(payload, getSessionSecret())) !== signature) {
     return null;
   }
 
@@ -95,9 +103,4 @@ export async function requireUser(options: { allowTemporary?: boolean } = {}) {
     redirect("/login");
   }
 
-  if (user.mustChangePassword && !options.allowTemporary) {
-    redirect("/trocar-chave");
-  }
-
-  return user;
-}
+  if (user.mustChangeP

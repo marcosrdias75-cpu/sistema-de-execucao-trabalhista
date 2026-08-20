@@ -30,7 +30,11 @@ function diagnosticClass(ok: boolean) {
     : "border-rose-200 bg-rose-50 text-rose-900";
 }
 
-export default async function OpenClawSettingsPage(props: PageProps<"/configuracoes/openclaw">) {
+interface OpenClawSettingsPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function OpenClawSettingsPage(props: OpenClawSettingsPageProps) {
   const user = await requireUser();
   const searchParams = await props.searchParams;
   const settings = await getOpenClawSettings();
@@ -184,14 +188,4 @@ export default async function OpenClawSettingsPage(props: PageProps<"/configurac
                   </article>
                 ))
               ) : (
-                <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                  Configure URL e token antes de testar.
-                </p>
-              )}
-            </div>
-          </section>
-        ) : null}
-      </div>
-    </main>
-  );
-}
+                <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">

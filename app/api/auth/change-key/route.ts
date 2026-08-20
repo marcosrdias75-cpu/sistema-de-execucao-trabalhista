@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSession, getSessionUser } from "@/lib/auth";
-import { hashCredential, sha256Digest, verifyCredential } from "@/lib/crypto";
+import { hashCredential, verifyCredential } from "@/lib/crypto";
 import { findUser, updateUserPassword } from "@/lib/database";
 import { getSafeNextPath, withNext } from "@/lib/navigation";
-import { initialUser } from "@/lib/seed-data";
 
 async function readChangeRequest(request: Request) {
   const contentType = request.headers.get("content-type") ?? "";
@@ -69,12 +68,7 @@ export async function POST(request: Request) {
     await readChangeRequest(request);
 
   const matchesStoredHash = await verifyCredential(currentPassword, user.password_hash);
-  const matchesTemporaryKey =
-    Boolean(user.must_change_password) &&
-    user.email === initialUser.email &&
-    (await sha256Digest(currentPassword)) === initialUser.temporaryKeyDigest;
-
-  if (!matchesStoredHash && !matchesTemporaryKey) {
+  if (!matchesStoredHash) {
     if (wantsRedirect) {
       return redirectTo(request, `${withNext("/trocar-chave", nextPath)}&error=current`);
     }
@@ -116,8 +110,4 @@ export async function POST(request: Request) {
   await createSession(user.email);
 
   if (wantsRedirect) {
-    return redirectTo(request, nextPath);
-  }
-
-  return NextResponse.json({ ok: true, redirectTo: nextPath });
-}
+   

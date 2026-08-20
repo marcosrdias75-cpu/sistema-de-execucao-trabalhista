@@ -38,3 +38,6 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+
+# dados jurídicos e exportações nunca entram no Git
+/backup/d1/*.json

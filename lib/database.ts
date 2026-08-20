@@ -1,5 +1,4 @@
-import { env } from "cloudflare:workers";
-import { initialUser } from "@/lib/seed-data";
+import { postgresDatabase } from "@/lib/postgres";
 
 export interface DbUser {
   email: string;
@@ -75,19 +74,8 @@ const defaultEdit = {
   reviewStatus: "pending_review",
 };
 
-interface OpenClawEnv {
-  OPENCLAW_GATEWAY_TOKEN?: string;
-  OPENCLAW_GATEWAY_URL?: string;
-  OPENCLAW_WEBHOOK_TOKEN?: string;
-  OPENCLAW_WEBHOOK_URL?: string;
-}
-
 function getDb() {
-  if (!env.DB) {
-    throw new Error("Banco online indisponivel.");
-  }
-
-  return env.DB;
+  return postgresDatabase;
 }
 
 export async function ensureDatabase() {
@@ -148,51 +136,6 @@ export async function ensureDatabase() {
       ON ai_analysis_runs(process_number, updated_at)`),
   ]);
 
-  const existingUser = await db
-    .prepare("SELECT email, password_hash, must_change_password FROM users WHERE email = ?")
-    .bind(initialUser.email)
-    .first<{ email: string; password_hash: string; must_change_password: number }>();
-
-  if (!existingUser) {
-    const now = new Date().toISOString();
-    await db
-      .prepare(
-        `INSERT INTO users (
-          email, name, role, password_hash, must_change_password, created_at,
-          updated_at, password_changed_at, temporary_credential_created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .bind(
-        initialUser.email,
-        initialUser.name,
-        initialUser.role,
-        initialUser.passwordHash,
-        initialUser.mustChangePassword ? 1 : 0,
-        now,
-        now,
-        null,
-        initialUser.temporaryCredentialCreatedAt,
-      )
-      .run();
-  } else if (
-    existingUser.must_change_password === 1 &&
-    existingUser.password_hash.startsWith("pbkdf2_sha256$210000$")
-  ) {
-    const now = new Date().toISOString();
-    await db
-      .prepare(
-        `UPDATE users
-         SET password_hash = ?, updated_at = ?, temporary_credential_created_at = ?
-         WHERE email = ?`,
-      )
-      .bind(
-        initialUser.passwordHash,
-        now,
-        initialUser.temporaryCredentialCreatedAt,
-        initialUser.email,
-      )
-      .run();
-  }
 }
 
 export async function findUser(email: string) {
@@ -237,9 +180,14 @@ function rowToEdit(row: Record<string, unknown> | null, processNumber: string): 
     };
   }
 
+  const rawAuditTrail = row.audit_trail;
+  const auditTrail = Array.isArray(rawAuditTrail)
+    ? (rawAuditTrail as PilotEdit["auditTrail"])
+    : JSON.parse(String(rawAuditTrail ?? "[]")) as PilotEdit["auditTrail"];
+
   return {
     amountReceived: row.amount_received as number | null,
-    auditTrail: JSON.parse(String(row.audit_trail ?? "[]")) as PilotEdit["auditTrail"],
+    auditTrail,
     availableCash: row.available_cash as number | null,
     creditConsolidated: row.credit_consolidated as number | null,
     guaranteeStatus: row.guarantee_status as string | null,
@@ -277,10 +225,9 @@ export async function getPilotEdit(processNumber: string) {
 }
 
 function readOpenClawEnv() {
-  const openClawEnv = env as unknown as OpenClawEnv;
   return {
-    token: openClawEnv.OPENCLAW_WEBHOOK_TOKEN?.trim() || openClawEnv.OPENCLAW_GATEWAY_TOKEN?.trim() || null,
-    webhookUrl: openClawEnv.OPENCLAW_WEBHOOK_URL?.trim() || openClawEnv.OPENCLAW_GATEWAY_URL?.trim() || null,
+    token: process.env.OPENCLAW_WEBHOOK_TOKEN?.trim() || process.env.OPENCLAW_GATEWAY_TOKEN?.trim() || null,
+    webhookUrl: process.env.OPENCLAW_WEBHOOK_URL?.trim() || process.env.OPENCLAW_GATEWAY_URL?.trim() || null,
   };
 }
 
@@ -374,7 +321,9 @@ function rowToAiAnalysisRun(row: Record<string, unknown> | null): AiAnalysisRun 
   const rawPayload = row.result_payload;
   let resultPayload: Record<string, unknown> | null = null;
 
-  if (typeof rawPayload === "string" && rawPayload.trim()) {
+  if (rawPayload && typeof rawPayload === "object" && !Array.isArray(rawPayload)) {
+    resultPayload = rawPayload as Record<string, unknown>;
+  } else if (typeof rawPayload === "string" && rawPayload.trim()) {
     try {
       const parsed = JSON.parse(rawPayload) as unknown;
       resultPayload =
@@ -443,9 +392,9 @@ export async function createAiAnalysisRun(input: {
     completedAt: null,
     failureMessage: null,
     id: crypto.randomUUID(),
-    modelRoute: input.modelRoute ?? "openai/codex-subscription",
+    modelRoute: input.modelRoute ?? "openclaw/chatgpt-subscription",
     processNumber: input.processNumber,
-    promptVersion: "sigrj-openclaw-v1",
+    promptVersion: "sigrj-openclaw-juridico-v2",
     provider: "openclaw",
     requestedAt: now,
     requestedBy: input.requestedBy,
@@ -629,28 +578,4 @@ export async function savePilotEdit(
         next_action = excluded.next_action,
         legal_notes = excluded.legal_notes,
         internal_notes = excluded.internal_notes,
-        updated_at = excluded.updated_at,
-        updated_by = excluded.updated_by,
-        audit_trail = excluded.audit_trail`,
-    )
-    .bind(
-      processNumber,
-      next.reviewStatus,
-      next.priority,
-      next.responsible,
-      next.workingExecutionClassification,
-      next.creditConsolidated,
-      next.amountReceived,
-      next.availableCash,
-      next.guaranteeStatus,
-      next.nextAction,
-      next.legalNotes,
-      next.internalNotes,
-      next.updatedAt,
-      next.updatedBy,
-      JSON.stringify(next.auditTrail),
-    )
-    .run();
-
-  return next;
-}
+        updated_at = exclu

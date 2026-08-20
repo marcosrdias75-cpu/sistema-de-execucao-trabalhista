@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { completeAiAnalysisRun, getAiAnalysisRun, getOpenClawCredentials } from "@/lib/database";
+import { persistStructuredAnalysis } from "@/lib/documents";
 
 interface RouteContext {
   params: Promise<{ runId: string }>;
@@ -11,7 +12,9 @@ function cleanText(value: unknown) {
 
 function cleanList(value: unknown) {
   return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string" && item.trim()).map((item) => item.trim())
+    ? value
+        .filter((item): item is string => typeof item === "string" && Boolean(item.trim()))
+        .map((item) => item.trim())
     : [];
 }
 
@@ -75,6 +78,7 @@ export async function POST(request: Request, context: RouteContext) {
     resultPayload,
     resultText,
   });
-
-  return NextResponse.json({ ok: true });
-}
+  await persistStructuredAnalysis({
+    aiRunId: run.id,
+    payload: resultPayload,
+    processNumbe

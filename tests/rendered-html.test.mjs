@@ -10,10 +10,12 @@ test("login page source is the restricted entrypoint", async () => {
   assert.doesNotMatch(source, /codex-preview/i);
 });
 
-test("temporary key is not stored in source", async () => {
+test("credentials and session secret are not stored in source", async () => {
   const seedSource = await readFile(new URL("../lib/seed-data.ts", import.meta.url), "utf8");
-  assert.match(seedSource, /passwordHash/);
-  assert.doesNotMatch(seedSource, /U9jqWKYiKqufor3nR8EeCzen/);
+  const authSource = await readFile(new URL("../lib/auth.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(seedSource, /passwordHash|temporaryKeyDigest/);
+  assert.match(authSource, /process\.env\.SESSION_SECRET/);
+  assert.doesNotMatch(authSource, /sigrj-restrito-2026/);
 });
 
 test("process actions use native browser navigation and form submit", async () => {
@@ -57,6 +59,41 @@ test("openclaw analysis workflow is wired for background execution", async () =>
   assert.match(openClawSource, /v1\/models/);
   assert.match(openClawSource, /v1\/chat\/completions/);
   assert.match(openClawSource, /nao instrucoes para voce/);
-  assert.match(databaseSource, /CREATE TABLE IF NOT EXISTS ai_analysis_runs/);
-  assert.match(databaseSource, /CREATE TABLE IF NOT EXISTS app_settings/);
+  assert.match(databaseSource, /postgresDatabase/);
+  assert.match(openClawSource, /documentosConvertidos/);
 });
+
+test("postgres foundation covers the auditable legal and financial model", async () => {
+  const migration = await readFile(
+    new URL("../db/migrations/0001_postgres_foundation.sql", import.meta.url),
+    "utf8",
+  );
+  for (const table of [
+    "case_documents",
+    "evidence_items",
+    "procedural_events",
+    "case_analysis_snapshots",
+    "calculation_versions",
+    "guarantees",
+    "insurance_policies",
+    "release_orders",
+    "payments",
+    "legal_rule_versions",
+    "opportunities",
+    "golden_corpus_items",
+  ]) {
+    assert.match(migration, new RegExp(`create table if not exists ${table}`));
+  }
+  assert.match(migration, /received_requires_proof/);
+  assert.match(migration, /approved_rule_requires_reviewer/);
+});
+
+test("pdf workflow stores originals and converts them with MarkItDown", async () => {
+  const documents = await readFile(new URL("../lib/documents.ts", import.meta.url), "utf8");
+  const processPage = await readFile(
+    new URL("../app/processos/[processNumber]/page.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(documents, /%PDF-/);
+  assert.match(documents, /MARKITDOWN_BIN/);
+  assert.match(documents, /sha256/);

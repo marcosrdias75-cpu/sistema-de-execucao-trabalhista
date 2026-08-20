@@ -1,35 +1,39 @@
 # Sistema de Execução Trabalhista
 
-Cópia privada do projeto **SIGRJ Restrito - Marcos**, desenvolvido para apoiar a triagem, revisão e análise de oportunidades em execuções trabalhistas.
-
-## Conteúdo
-
-- Código-fonte completo da aplicação.
-- Migrações e esquema do Cloudflare D1.
-- Backup dos dados das tabelas users, pilot_edits, app_settings e ai_analysis_runs.
-- Contexto funcional e técnico.
-- Instruções de restauração.
+Plataforma interna para triagem, revisão humana e recuperação de créditos em
+execuções trabalhistas, com foco inicial na carteira Casas Bahia.
 
 ## Arquitetura
 
-- Vinext/Next.js e TypeScript.
-- Execução em Cloudflare Workers.
-- Banco Cloudflare D1, vínculo lógico DB.
-- Autenticação própria da aplicação.
-- Integração de análise com OpenClaw.
-- Hospedagem original pelo ChatGPT Sites.
+- Next.js e TypeScript em container Docker.
+- PostgreSQL dedicado no Dokploy, com migrations SQL versionadas.
+- PDFs originais em volume privado e conversão por Microsoft MarkItDown.
+- Integração OpenClaw pela assinatura ChatGPT disponível no servidor.
+- Conclusões estruturadas com confiança, eventos, evidências e revisão humana.
 
-## Estrutura principal
+## Modelo coberto
 
-- app/: telas e rotas HTTP.
-- lib/: regras de negócio, autenticação, banco e integração OpenClaw.
-- db/ e drizzle/: esquema e migrações.
-- worker/: entrada do Cloudflare Worker.
-- backup/d1/: cópia dos dados do banco.
-- docs/: contexto e restauração.
+A migration PostgreSQL contempla carteira, processos relacionados, documentos,
+evidências, timeline, cálculos, crédito, garantias, seguro, pagamentos, alvarás,
+eventos de recuperação judicial, regras versionadas, oportunidades e Golden Corpus.
+
+## Comandos
+
+| Comando | Função |
+|---|---|
+| `npm run dev` | Desenvolvimento local |
+| `npm run lint` | Lint |
+| `npm run typecheck` | Verificação TypeScript |
+| `npm run build` | Build de produção |
+| `npm run db:migrate` | Aplica migrations pendentes |
+| `npm run db:import-d1` | Importa uma exportação D1 privada uma única vez |
+| `npm run db:seed-admin` | Cria/rotaciona o administrador inicial |
 
 ## Segurança
 
-Este repositório deve permanecer **privado**. O backup contém dados jurídicos, identificação de usuário, hash de senha e configuração ativa de integração. Não publique, não faça fork público e não compartilhe o conteúdo sem autorização.
+O repositório deve permanecer **privado**. Dados jurídicos, documentos, backups,
+hashes de credencial e tokens não podem ser versionados. O token OpenClaw legado
+é ignorado pelo importador e deve ser substituído por segredo novo no Dokploy.
 
-Consulte [docs/CONTEXTO.md](docs/CONTEXTO.md) e [docs/BACKUP_E_RESTAURACAO.md](docs/BACKUP_E_RESTAURACAO.md).
+Consulte [docs/CONTEXTO.md](docs/CONTEXTO.md) e
+[docs/BACKUP_E_RESTAURACAO.md](docs/BACKUP_E_RESTAURACAO.md).

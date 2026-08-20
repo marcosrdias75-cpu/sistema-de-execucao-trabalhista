@@ -9,6 +9,7 @@ import {
   markAiAnalysisRunFailed,
   markAiAnalysisRunSent,
 } from "@/lib/database";
+import { latestDocumentContext, persistStructuredAnalysis } from "@/lib/documents";
 import {
   buildOpenClawPrompt,
   dispatchOpenClawRun,
@@ -75,10 +76,11 @@ export async function POST(request: Request, context: RouteContext) {
     return auth.response;
   }
 
-  const [edit, deadlines, pjeReferences] = await Promise.all([
+  const [edit, deadlines, pjeReferences, documents] = await Promise.all([
     getPilotEdit(pilotCase.processNumber),
     Promise.resolve(getProcessDeadlines(pilotCase.processNumber)),
     Promise.resolve(getPjeReferences(pilotCase.processNumber)),
+    latestDocumentContext(pilotCase.processNumber),
   ]);
   const analysis = buildCaseAnalyses(new Map([[pilotCase.processNumber, edit]])).find(
     (item) => item.processNumber === pilotCase.processNumber,
@@ -91,6 +93,7 @@ export async function POST(request: Request, context: RouteContext) {
   const analysisPackage: OpenClawAnalysisPackage = {
     analysis,
     deadlines,
+    documents,
     edit,
     pjeReferences,
     pilotCase,
@@ -109,8 +112,11 @@ export async function POST(request: Request, context: RouteContext) {
     prompt,
     runId: run.id,
   }).catch((error: unknown) => ({
+    completed: false,
     dispatched: false,
     failureMessage: error instanceof Error ? error.message : "Falha inesperada ao acionar OpenClaw.",
+    resultPayload: null,
+    resultText: undefined,
     status: "failed" as const,
   }));
 
@@ -119,6 +125,11 @@ export async function POST(request: Request, context: RouteContext) {
       await completeAiAnalysisRun(run.id, {
         resultPayload: dispatchResult.resultPayload ?? null,
         resultText: dispatchResult.resultText,
+      });
+      await persistStructuredAnalysis({
+        aiRunId: run.id,
+        payload: dispatchResult.resultPayload ?? null,
+        processNumber: pilotCase.processNumber,
       });
       return redirectTo(request, `${processPath}?analysis=completed`);
     }
@@ -129,8 +140,4 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (dispatchResult.status === "failed" && dispatchResult.failureMessage) {
     await markAiAnalysisRunFailed(run.id, dispatchResult.failureMessage);
-    return redirectTo(request, `${processPath}?analysis=failed`);
-  }
-
-  return redirectTo(request, `${processPath}?analysis=queued`);
-}
+    return redirec

@@ -11,7 +11,11 @@ const loginErrors: Record<string, string> = {
   session: "Sessao expirada. Entre novamente.",
 };
 
-export default async function LoginPage(props: PageProps<"/login">) {
+interface LoginPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function LoginPage(props: LoginPageProps) {
   const searchParams = await props.searchParams;
   const errorCode = typeof searchParams?.error === "string" ? searchParams.error : null;
   const nextPath = getSafeNextPath(searchParams?.next);
@@ -37,7 +41,3 @@ export default async function LoginPage(props: PageProps<"/login">) {
         <div className="mt-5">
           <LoginForm initialError={errorCode ? loginErrors[errorCode] : null} nextPath={nextPath} />
         </div>
-      </section>
-    </main>
-  );
-}

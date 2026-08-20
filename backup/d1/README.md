@@ -1,8 +1,11 @@
-# Backup do D1
+# Backup legado do D1
 
-Esta pasta contém uma cópia confidencial do banco ativo do projeto.
+Os arquivos confidenciais foram removidos do repositório. A exportação original deve ser
+mantida somente em cofre/backup privado e usada por caminho externo com
+`D1_BACKUP_PATH` durante a migração autorizada.
 
-- full-export.json: formato de auditoria e leitura.
-- data.sql: formato de restauração SQLite/D1.
+- `full-export.json`: formato aceito pelo importador, deliberadamente ignorado pelo Git.
+- `data.sql`: restauração D1 legada, deliberadamente ignorada pelo Git.
 
-O conteúdo inclui configurações ativas e credenciais derivadas. Mantenha o repositório privado e faça rotação dos segredos ao restaurar.
+Tokens OpenClaw antigos não são importados. Credenciais de usuário restauradas exigem
+troca e devem ser substituídas antes da liberação do sistem

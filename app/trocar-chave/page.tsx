@@ -11,7 +11,11 @@ const changeKeyErrors: Record<string, string> = {
   same: "A nova chave precisa ser diferente da temporaria.",
 };
 
-export default async function ChangeKeyPage(props: PageProps<"/trocar-chave">) {
+interface ChangeKeyPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function ChangeKeyPage(props: ChangeKeyPageProps) {
   const searchParams = await props.searchParams;
   const errorCode = typeof searchParams?.error === "string" ? searchParams.error : null;
   const nextPath = getSafeNextPath(searchParams?.next);
@@ -32,7 +36,4 @@ export default async function ChangeKeyPage(props: PageProps<"/trocar-chave">) {
             nextPath={nextPath}
           />
         </div>
-      </section>
-    </main>
-  );
-}
+   

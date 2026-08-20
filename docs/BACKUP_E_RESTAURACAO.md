@@ -1,24 +1,31 @@
-# Backup e restauração
+# Backup, migração e restauração
 
-## Arquivos
+## Artefatos protegidos
 
-- backup/d1/full-export.json: exportação estruturada por tabela.
-- backup/d1/data.sql: comandos INSERT OR REPLACE para restaurar os registros.
-- drizzle/: migrações que criam e atualizam o esquema.
+- exportação D1 original: mantida fora do Git, em armazenamento privado;
+- `db/migrations/`: fonte da verdade do PostgreSQL;
+- volume `/data/documents`: PDFs originais privados;
+- `pg_dump`: backup lógico do banco dedicado.
 
-## Restauração recomendada
+## Migração inicial
 
-1. Crie um banco D1 novo e configure o binding DB.
-2. Execute as migrações de drizzle/ na ordem numérica.
-3. Revise o arquivo backup/d1/data.sql.
-4. Importe o SQL no banco de destino.
-5. Configure os valores de ambiente necessários na plataforma de hospedagem.
-6. Troque tokens, chaves temporárias e senhas antes de liberar o sistema.
+1. Crie/restaure o PostgreSQL dedicado em rede privada.
+2. Execute `npm run db:migrate`.
+3. Aponte `D1_BACKUP_PATH` para a exportação privada e execute
+   `npm run db:import-d1` uma única vez.
+4. O importador não restaura o token OpenClaw legado e força troca de senha dos
+   usuários importados.
+5. Configure segredos novos no Dokploy e execute `npm run db:seed-admin`.
+6. Valide login, upload, MarkItDown, OpenClaw e restauração antes da liberação.
+
+## Rotina de backup
+
+- `pg_dump --format=custom` diário, retenção mínima de 14 cópias;
+- cópia do volume de documentos preservando permissões e hashes;
+- teste de restauração periódico em banco isolado;
+- nunca registrar conteúdo jurídico ou segredo em logs.
 
 ## Confidencialidade
 
-O backup contém dados pessoais e operacionais, inclusive hash de senha e token de integração. A restauração deve ocorrer apenas em ambiente privado e autorizado.
-
-## Integridade da exportação
-
-As tabelas e linhas foram lidas do banco D1 ativo. O leitor do Sites abrevia células longas; por isso, os nove campos analysis_prompt foram recompostos pelo gerador determinístico do código-fonte. Todos os prefixos disponibilizados pelo banco coincidiram antes da inclusão no backup.
+Backups contêm dados pessoais e jurídicos. O acesso deve ser restrito, auditado e
+compatível com as políticas internas e de LGPD do escritório.

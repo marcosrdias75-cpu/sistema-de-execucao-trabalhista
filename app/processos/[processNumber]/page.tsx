@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getLatestAiAnalysisRun, getPilotEdit, type AiAnalysisRun } from "@/lib/database";
+import { listCaseDocuments } from "@/lib/documents";
 import { getPilotCase, getPjeReferences, getProcessDeadlines } from "@/lib/seed-data";
 import { LogoutButton } from "@/app/ui/LogoutButton";
 import { EditForm } from "./EditForm";
@@ -189,10 +190,67 @@ function OpenClawPanel({
   );
 }
 
-export default async function ProcessPage(props: PageProps<"/processos/[processNumber]">) {
+interface ProcessPageProps {
+  params: Promise<{ processNumber: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+function recordValue(value: unknown) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function analysisStatus(payload: Record<string, unknown>, key: string) {
+  const section = recordValue(payload[key]);
+  return typeof section.status === "string" && section.status.trim()
+    ? section.status.replaceAll("_", " ")
+    : "nao identificado";
+}
+
+function StructuredAnalysis({ run }: { run: AiAnalysisRun | null }) {
+  if (!run?.resultPayload) return null;
+  const dimensions = [
+    ["Fase processual", "faseProcessual"],
+    ["Execucao", "execucao"],
+    ["Recursos", "recursos"],
+    ["Transito conhecimento", "transitoConhecimento"],
+    ["Transito execucao", "transitoExecucao"],
+    ["Calculo", "calculo"],
+    ["Credito FGTS", "creditoFgts"],
+  ];
+  const confidence = typeof run.resultPayload.confianca === "string"
+    ? run.resultPayload.confianca
+    : "nao informada";
+
+  return (
+    <Section title="Quadro estruturado da ultima analise">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {dimensions.map(([label, key]) => (
+          <div key={key} className="rounded-md border border-[#e3e6dd] bg-[#fbfcf8] p-3">
+            <p className="text-xs font-semibold uppercase text-[#6a7466]">{label}</p>
+            <p className="mt-1 text-sm font-semibold text-[#293127]">{analysisStatus(run.resultPayload!, key)}</p>
+          </div>
+        ))}
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
+          <p className="text-xs font-semibold uppercase text-amber-800">Confianca geral</p>
+          <p className="mt-1 text-sm font-semibold text-amber-900">{confidence.replaceAll("_", " ")}</p>
+        </div>
+      </div>
+      <p className="mt-3 text-xs leading-5 text-[#6a7466]">
+        Conclusoes da IA permanecem separadas dos fatos e exigem conferencia humana das evidencias.
+      </p>
+    </Section>
+  );
+}
+
+export default async function ProcessPage(props: ProcessPageProps) {
   await requireUser();
   const { processNumber } = await props.params;
   const searchParams = await props.searchParams;
+  const documentDetail = Array.isArray(searchParams?.detail)
+    ? searchParams.detail[0]
+    : searchParams?.detail;
   const savedByFallback = searchParams?.saved === "1";
   const processKey = decodeURIComponent(processNumber);
   const pilotCase = getPilotCase(processKey);
@@ -201,11 +259,12 @@ export default async function ProcessPage(props: PageProps<"/processos/[processN
     notFound();
   }
 
-  const [edit, pjeRefs, deadlines, latestOpenClawRun] = await Promise.all([
+  const [edit, pjeRefs, deadlines, latestOpenClawRun, documents] = await Promise.all([
     getPilotEdit(pilotCase.processNumber),
     Promise.resolve(getPjeReferences(pilotCase.processNumber)),
     Promise.resolve(getProcessDeadlines(pilotCase.processNumber)),
     getLatestAiAnalysisRun(pilotCase.processNumber),
+    listCaseDocuments(pilotCase.processNumber),
   ]);
   const balance =
     edit.creditConsolidated !== null && edit.amountReceived !== null
@@ -297,11 +356,79 @@ export default async function ProcessPage(props: PageProps<"/processos/[processN
             <EditForm processNumber={pilotCase.processNumber} initialEdit={edit} />
           </Section>
 
+          <StructuredAnalysis run={latestOpenClawRun} />
+
           <OpenClawPanel
             analysisMessage={searchParams?.analysis}
             processNumber={pilotCase.processNumber}
             run={latestOpenClawRun}
           />
+
+          <Section title="Documentos e evidencias">
+            {searchParams?.document === "processed" ? (
+              <p className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium text-emerald-800">
+                PDF armazenado e convertido em Markdown pelo MarkItDown.
+              </p>
+            ) : searchParams?.document === "duplicate" ? (
+              <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-800">
+                Este PDF ja estava vinculado ao processo; nenhuma copia foi criada.
+              </p>
+            ) : searchParams?.document === "failed" ? (
+              <p className="mb-4 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-800">
+                Nao foi possivel converter o PDF. {documentDetail ?? "Confira o arquivo e tente novamente."}
+              </p>
+            ) : null}
+
+            <form
+              action={`/api/documents/${encodeURIComponent(pilotCase.processNumber)}`}
+              method="post"
+              encType="multipart/form-data"
+              className="rounded-md border border-[#e3e6dd] bg-[#fbfcf8] p-3"
+            >
+              <label className="block text-sm font-semibold" htmlFor="case-pdf">Adicionar integra ou documento PDF</label>
+              <p className="mt-1 text-sm text-[#566052]">
+                O original fica privado; a camada Markdown alimenta a analise e preserva o hash de auditoria.
+              </p>
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  id="case-pdf"
+                  name="file"
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  required
+                  className="min-w-0 flex-1 rounded-md border border-[#c7ccbf] bg-white px-3 py-2 text-sm"
+                />
+                <button type="submit" className="h-10 rounded-md bg-emerald-900 px-4 text-sm font-semibold text-white">
+                  Enviar e converter
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-4 grid gap-3">
+              {documents.length === 0 ? (
+                <p className="text-sm text-[#566052]">Nenhum PDF armazenado neste processo.</p>
+              ) : documents.map((document) => (
+                <article key={document.id} className="rounded-md border border-[#e3e6dd] bg-white p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold">{document.originalName}</p>
+                      <p className="mt-1 text-xs text-[#6a7466]">
+                        {(document.fileSize / 1024 / 1024).toFixed(2)} MB · {document.extractionStatus} · SHA-256 {document.sha256.slice(0, 12)}…
+                      </p>
+                    </div>
+                    <a
+                      href={`/api/documents/file/${document.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-9 items-center justify-center rounded-md border border-emerald-800 px-3 text-sm font-medium text-emerald-800"
+                    >
+                      Abrir original
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Section>
 
           <Section title="Prazos do processo">
             {deadlines.length > 0 ? (
@@ -385,17 +512,4 @@ export default async function ProcessPage(props: PageProps<"/processos/[processN
                       </a>
                     </div>
                     {reference.notes ? (
-                      <p className="mt-2 text-sm leading-6 text-[#566052]">{reference.notes}</p>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-[#566052]">Nenhuma referencia PJe vinculada.</p>
-            )}
-          </Section>
-        </div>
-      </div>
-    </main>
-  );
-}
+              

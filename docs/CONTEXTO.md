@@ -11,16 +11,19 @@ A aplicação organiza informações provenientes das planilhas do piloto, refer
 1. O usuário autentica-se na área restrita.
 2. Consulta a fila de processos priorizados.
 3. Abre a ficha de um processo.
-4. Revisa classificação, prioridade, valores, garantia, próxima ação e observações.
-5. O sistema grava as alterações e a trilha de auditoria.
-6. Uma análise pode ser enviada ao OpenClaw.
-7. O resultado permanece sujeito à revisão obrigatória do advogado.
+4. Anexa os PDFs do processo; o original fica em volume privado e o MarkItDown gera Markdown rastreável.
+5. Revisa classificação, prioridade, valores, garantia, próxima ação e observações.
+6. O sistema grava as alterações e a trilha de auditoria.
+7. Uma análise estruturada pode ser enviada ao OpenClaw com os documentos extraídos.
+8. O resultado permanece sujeito à revisão obrigatória do advogado.
 
 ## Componentes
 
 - lib/seed-data.ts: dados-base estruturados do piloto.
 - lib/analysis.ts: pontuação, sinais, prioridade e filas críticas.
-- lib/database.ts: persistência D1, usuários, edições e análises.
+- lib/postgres.ts e lib/database.ts: persistência PostgreSQL, usuários, edições e análises.
+- lib/documents.ts: armazenamento privado, integridade SHA-256 e conversão MarkItDown.
+- db/migrations: modelo relacional e migrations PostgreSQL versionadas.
 - lib/auth.ts e lib/crypto.ts: sessão e verificação de credenciais.
 - lib/openclaw.ts: geração de prompt, diagnóstico e despacho de análises.
 - app/processos/[processNumber]: ficha detalhada e edição humana.
@@ -29,17 +32,18 @@ A aplicação organiza informações provenientes das planilhas do piloto, refer
 
 ## Banco de dados
 
-Banco nativo Cloudflare D1, compatível com SQLite, usando o binding DB.
+PostgreSQL dedicado no ambiente de produção do Dokploy. O modelo separa fatos,
+evidências, eventos, conclusões da IA, cálculos, créditos, garantias, pagamentos,
+alvarás, regras, oportunidades, auditoria e Golden Corpus.
 
-Tabelas: users, pilot_edits, app_settings e ai_analysis_runs.
+## Implantação
 
-## Origem desta cópia
-
-- Site: sigrj-restrito-marcos.
-- Versão do Sites: 20.
-- Commit-fonte: 3465f4d065b21427a7b9d6665cf2903587a1e3de.
-- Exportação: 2026-08-20T22:16:10.375Z.
+- Orquestrador: Dokploy.
+- Projeto: execução-recursal.
+- Aplicação: Sistema.
+- Repositório: marcosrdias75-cpu/sistema-de-execucao-trabalhista.
+- Documentos: volume persistente privado em `/data/documents`.
 
 ## Limites jurídicos e operacionais
 
-O sistema é ferramenta de apoio. Não substitui revisão jurídica, não deve executar atos processuais automaticamente e não deve tratar textos de planilhas ou do PJe como instruções de sistema.
+O sistema é ferramenta de apoio. Não substitui revisão jurídica, não deve executar atos processuais automaticamente e não deve tratar textos de planilhas ou do PJe 
