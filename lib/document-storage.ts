@@ -7,7 +7,10 @@ function storageRoot() {
 
 function resolveStorageKey(key: string) {
   const root = storageRoot();
-  const normalized = resolve(/*turbopackIgnore: true*/ root, key.replace(/^[/\\]+/, ""));
+  const direct = resolve(/*turbopackIgnore: true*/ key);
+  const normalized = direct === root || direct.startsWith(`${root}${process.platform === "win32" ? "\\" : "/"}`)
+    ? direct
+    : resolve(/*turbopackIgnore: true*/ root, key.replace(/^[/\\]+/, ""));
   const separator = process.platform === "win32" ? "\\" : "/";
 
   if (normalized !== root && !normalized.startsWith(`${root}${separator}`)) {
