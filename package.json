@@ -8,13 +8,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "typecheck": "tsc --noEmit",
     "db:migrate": "node scripts/migrate.mjs",
     "db:import-d1": "node scripts/import-d1-backup.mjs",
-    "db:seed-admin": "node scripts/seed-admin.mjs"
+    "db:seed-admin": "node scripts/seed-admin.mjs",
+    "worker:ocr": "node scripts/ocr-worker.mjs",
+    "worker:pje-links": "node scripts/pje-link-worker.mjs"
   },
   "dependencies": {
     "next": "16.2.6",

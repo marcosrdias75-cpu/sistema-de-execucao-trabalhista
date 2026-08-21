@@ -3,12 +3,12 @@ import { getSessionUser } from "@/lib/auth";
 import { importPdf, listCaseDocuments } from "@/lib/documents";
 import { getPilotCase, toProcessSlug } from "@/lib/seed-data";
 
-interface RouteContext { params: Promise<{ processNumber: string }> }
+interface RouteContext { params: Promise<{ documentId: string }> }
 
 export async function GET(_request: Request, context: RouteContext) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
-  const processNumber = decodeURIComponent((await context.params).processNumber);
+  const processNumber = decodeURIComponent((await context.params).documentId);
   return NextResponse.json(await listCaseDocuments(processNumber));
 }
 
@@ -17,7 +17,7 @@ export async function POST(request: Request, context: RouteContext) {
   if (!user || user.mustChangePassword) {
     return NextResponse.redirect(new URL("/login", request.url), { status: 303 });
   }
-  const processNumber = decodeURIComponent((await context.params).processNumber);
+  const processNumber = decodeURIComponent((await context.params).documentId);
   if (!getPilotCase(processNumber)) {
     return NextResponse.json({ error: "Processo nao encontrado." }, { status: 404 });
   }
@@ -40,7 +40,7 @@ export async function POST(request: Request, context: RouteContext) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Falha no processamento.";
     return NextResponse.redirect(
-      new URL(`/processos/${toProcessSlug(processNumber)}?document=failed&detail=${encodeURIComponent(message.slice(0,200))}`, request.url),
+      new URL(`/processos/${toProcessSlug(processNumber)}?document=failed&detail=${encodeURIComponent(message.slice(0, 200))}`, request.url),
       { status: 303 },
     );
   }
