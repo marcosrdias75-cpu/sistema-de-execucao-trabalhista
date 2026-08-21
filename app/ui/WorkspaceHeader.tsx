@@ -5,6 +5,7 @@ const links = [
   { href: "/", label: "Visão geral" },
   { href: "/processos", label: "Carteira" },
   { href: "/oportunidades", label: "Oportunidades" },
+  { href: "/questionarios", label: "Questionários" },
   { href: "/importacoes", label: "Importações" },
   { href: "/documentos", label: "Documentos" },
   { href: "/configuracoes/pje", label: "PJe" },

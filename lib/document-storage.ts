@@ -2,12 +2,12 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
 function storageRoot() {
-  return resolve(process.env.STORAGE_ROOT?.trim() || "/data/documents");
+  return resolve(/*turbopackIgnore: true*/ process.env.STORAGE_ROOT?.trim() || "/data/documents");
 }
 
 function resolveStorageKey(key: string) {
   const root = storageRoot();
-  const normalized = resolve(root, key.replace(/^[/\\]+/, ""));
+  const normalized = resolve(/*turbopackIgnore: true*/ root, key.replace(/^[/\\]+/, ""));
   const separator = process.platform === "win32" ? "\\" : "/";
 
   if (normalized !== root && !normalized.startsWith(`${root}${separator}`)) {
@@ -19,12 +19,15 @@ function resolveStorageKey(key: string) {
 
 export async function storeDocumentBytes(input: {
   key: string;
-  bytes: ArrayBuffer;
+  bytes: ArrayBuffer | ArrayBufferView;
   contentType: string;
 }) {
   const path = resolveStorageKey(input.key);
   await mkdir(dirname(path), { recursive: true });
-  await writeFile(path, Buffer.from(input.bytes), { mode: 0o600 });
+  const bytes = input.bytes instanceof ArrayBuffer
+    ? Buffer.from(input.bytes)
+    : Buffer.from(input.bytes.buffer, input.bytes.byteOffset, input.bytes.byteLength);
+  await writeFile(path, bytes, { mode: 0o600 });
   return path;
 }
 
