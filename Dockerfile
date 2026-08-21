@@ -41,6 +41,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/db/migrations ./db/migrations
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/migrate.mjs ./scripts/migrate.mjs
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/import-d1-backup.mjs ./scripts/import-d1-backup.mjs
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/import-users.mjs ./scripts/import-users.mjs
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/seed-admin.mjs ./scripts/seed-admin.mjs
 
 USER nextjs
