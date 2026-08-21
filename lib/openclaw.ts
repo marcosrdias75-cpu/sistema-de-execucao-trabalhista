@@ -249,6 +249,10 @@ function getAuthSecret(credentials: Awaited<ReturnType<typeof getOpenClawCredent
   return credentials.token?.trim() || null;
 }
 
+function openClawModelRoute() {
+  return process.env.OPENCLAW_MODEL_ROUTE?.trim() || "openclaw/execucao-recursal";
+}
+
 function classifyOpenClawHttpStatus(status: number) {
   if (status >= 200 && status < 300) {
     return "Conexao aceita pelo Gateway.";
@@ -338,7 +342,7 @@ export async function testOpenClawGateway(): Promise<OpenClawDiagnosticResult> {
         body: {
           max_completion_tokens: 16,
           messages: [{ content: "Responda apenas: OK", role: "user" }],
-          model: "openclaw/default",
+          model: openClawModelRoute(),
           stream: false,
           user: "sigrj:diagnostico",
         },
@@ -443,7 +447,7 @@ async function dispatchChatCompletionRun(
           },
           { content: prompt, role: "user" },
         ],
-        model: "openclaw/default",
+        model: openClawModelRoute(),
         stream: false,
         temperature: 0.1,
         user: `sigrj:${input.runId}`,
@@ -626,4 +630,31 @@ export async function dispatchOpenClawRun(input: {
     body: JSON.stringify({
       callback_url: input.callbackUrl,
       process_number: input.analysisPackage.pilotCase.processNumber,
-      pro
+      process_url: input.processUrl,
+      prompt: input.prompt,
+      run_id: input.runId,
+      source: "sigrj",
+      task: "legal_credit_recovery_analysis",
+    }),
+    headers,
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    return {
+      dispatched: false,
+      failureMessage: `OpenClaw respondeu ${response.status}.`,
+      status: "failed" as const,
+    };
+  }
+
+  return {
+    dispatched: true,
+    failureMessage: null,
+    status: "sent" as const,
+  };
+}
+
+export function getProcessPublicPath(processNumber: string) {
+  return `/processos/${toProcessSlug(processNumber)}`;
+}

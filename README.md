@@ -9,6 +9,7 @@ execuções trabalhistas, com foco inicial na carteira Casas Bahia.
 - PostgreSQL dedicado no Dokploy, com migrations SQL versionadas.
 - PDFs originais em volume privado e conversão por Microsoft MarkItDown.
 - Integração OpenClaw pela assinatura ChatGPT disponível no servidor.
+- Rota dedicada `openclaw/execucao-recursal`, isolada dos demais agentes.
 - Conclusões estruturadas com confiança, eventos, evidências e revisão humana.
 
 ## Modelo coberto
