@@ -1,4 +1,5 @@
 import { createSign, randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import type { QuestionnaireAnswers } from "@/lib/questionnaire-schema";
 import { driveParentFolderId } from "@/lib/questionnaire-schema";
 
@@ -32,8 +33,21 @@ function base64Url(input: string | Buffer) {
   return Buffer.from(input).toString("base64").replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
 }
 
+function readSecretFile(path?: string | null) {
+  if (!path) return null;
+
+  try {
+    return readFileSync(path, "utf8").trim() || null;
+  } catch {
+    return null;
+  }
+}
+
 function readCredentials(): ServiceAccountCredentials | null {
-  const json = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
+  const json =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim() ||
+    readSecretFile(process.env.GOOGLE_SERVICE_ACCOUNT_JSON_FILE) ||
+    readSecretFile("/run/secrets/google_service_account_json");
 
   if (json) {
     const parsed = JSON.parse(json) as { client_email?: string; private_key?: string };
