@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { decodeJson, encodeJson, signValue } from "@/lib/crypto";
 import { findUser } from "@/lib/database";
@@ -36,6 +36,29 @@ async function createCookieValue(email: string) {
   return `${payload}.${await signValue(payload, getSessionSecret())}`;
 }
 
+async function shouldUseSecureCookie() {
+  const override = process.env.COOKIE_SECURE?.trim().toLowerCase();
+
+  if (override) {
+    return !["0", "false", "no", "off"].includes(override);
+  }
+
+  const headerStore = await headers();
+  const forwardedProto = headerStore.get("x-forwarded-proto")?.split(",")[0]?.trim().toLowerCase();
+
+  if (forwardedProto) {
+    return forwardedProto === "https";
+  }
+
+  const origin = headerStore.get("origin") ?? headerStore.get("referer");
+
+  if (origin) {
+    return origin.startsWith("https://");
+  }
+
+  return process.env.NODE_ENV === "production";
+}
+
 async function readCookiePayload() {
   const cookieStore = await cookies();
   const cookieValue = cookieStore.get(cookieName)?.value;
@@ -66,7 +89,7 @@ export async function createSession(email: string) {
     maxAge: sessionSeconds,
     path: "/",
     sameSite: "lax",
-    secure: true,
+    secure: await shouldUseSecureCookie(),
   });
 }
 
