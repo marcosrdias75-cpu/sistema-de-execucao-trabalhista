@@ -1,7 +1,13 @@
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
+ENV npm_config_audit=false \
+    npm_config_fund=false \
+    npm_config_progress=false \
+    npm_config_update_notifier=false \
+    npm_config_fetch_timeout=120000 \
+    npm_config_fetch_retry_maxtimeout=120000
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --no-audit --no-fund --progress=false --loglevel=warn
 
 FROM node:22-bookworm-slim AS builder
 WORKDIR /app
