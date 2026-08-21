@@ -578,4 +578,28 @@ export async function savePilotEdit(
         next_action = excluded.next_action,
         legal_notes = excluded.legal_notes,
         internal_notes = excluded.internal_notes,
-        updated_at = exclu
+        updated_at = excluded.updated_at,
+        updated_by = excluded.updated_by,
+        audit_trail = excluded.audit_trail`,
+    )
+    .bind(
+      processNumber,
+      next.reviewStatus,
+      next.priority,
+      next.responsible,
+      next.workingExecutionClassification,
+      next.creditConsolidated,
+      next.amountReceived,
+      next.availableCash,
+      next.guaranteeStatus,
+      next.nextAction,
+      next.legalNotes,
+      next.internalNotes,
+      next.updatedAt,
+      next.updatedBy,
+      JSON.stringify(next.auditTrail),
+    )
+    .run();
+
+  return next;
+}

@@ -512,4 +512,17 @@ export default async function ProcessPage(props: ProcessPageProps) {
                       </a>
                     </div>
                     {reference.notes ? (
-              
+                      <p className="mt-2 text-sm leading-6 text-[#566052]">{reference.notes}</p>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-[#566052]">Nenhuma referencia PJe vinculada.</p>
+            )}
+          </Section>
+        </div>
+      </div>
+    </main>
+  );
+}

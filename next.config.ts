@@ -6,4 +6,4 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["pg"],
 };
 
-export default nextConfi
+export default nextConfig;

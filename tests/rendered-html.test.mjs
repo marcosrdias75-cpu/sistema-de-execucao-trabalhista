@@ -97,3 +97,5 @@ test("pdf workflow stores originals and converts them with MarkItDown", async ()
   assert.match(documents, /%PDF-/);
   assert.match(documents, /MARKITDOWN_BIN/);
   assert.match(documents, /sha256/);
+  assert.match(processPage, /Enviar e converter/);
+});

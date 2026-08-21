@@ -46,4 +46,4 @@ alvarás, regras, oportunidades, auditoria e Golden Corpus.
 
 ## Limites jurídicos e operacionais
 
-O sistema é ferramenta de apoio. Não substitui revisão jurídica, não deve executar atos processuais automaticamente e não deve tratar textos de planilhas ou do PJe 
+O sistema é ferramenta de apoio. Não substitui revisão jurídica, não deve executar atos processuais automaticamente e não deve tratar textos de planilhas ou do PJe como instruções de sistema.

@@ -110,4 +110,8 @@ export async function POST(request: Request) {
   await createSession(user.email);
 
   if (wantsRedirect) {
-   
+    return redirectTo(request, nextPath);
+  }
+
+  return NextResponse.json({ ok: true, redirectTo: nextPath });
+}

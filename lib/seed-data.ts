@@ -8892,4 +8892,265 @@ export const processDeadlines: ProcessDeadline[] = [
     "descricao": "Informar dados bancários",
     "observacao": "A fim de possibilitar a expedição de alvará, dá-se o prazo de 08 dias para que as partes, devidamente assistidas pelos seus patronos, indiquem: indicar os dados bancários completos (banco, agência, conta corrente ou poupança, CPF/CNPJ). Caso os dados bancários não sejam informados no prazo acima fixado, o alvará será expedido conforme o cadastro realizado junto ao SISCONDJ. - Alvará já expedido, aguardando cumprimento, acompanhando",
     "forum": "Vara do Trabalho de São Paulo / SP",
-   
+    "vara": "5ª",
+    "brutoReclamante": 631168.31,
+    "verificado": null,
+    "criadoPor": "Luiz Henrique De Souza",
+    "signals": [
+      "calculation",
+      "warrant"
+    ]
+  },
+  {
+    "id": "deadline-6672",
+    "sourceSheet": "Prazos",
+    "sourceRowNumber": 6672,
+    "processo": "1001190-13.2025.5.02.0005",
+    "dataInicial": "2026-07-21",
+    "dataFinal": "2026-07-23",
+    "dataFatal": "2026-07-24",
+    "reclamante": "JOCILEY DOS SANTOS ROCHA",
+    "empresa": "Grupo Casas Bahia S.A",
+    "tipoAcao": "Horas Extras e Diferença de Comissões",
+    "statusProcesso": "Execução Provisória",
+    "faseProcesso": "Impugnação do Cálculo",
+    "tipoPrazo": "Execução",
+    "statusPrazo": "Nada a Fazer",
+    "responsavel": "Tairine Machado",
+    "descricao": "Ver se tem Impugnação de Sentença Liquidação",
+    "observacao": "apenas liberação do incontroverso, há pendente julgamento dos AP's",
+    "forum": "Vara do Trabalho de São Paulo / SP",
+    "vara": "5ª",
+    "brutoReclamante": 631168.31,
+    "verificado": null,
+    "criadoPor": "Luiz Henrique De Souza",
+    "signals": [
+      "calculation",
+      "warrant",
+      "incontroversial"
+    ]
+  },
+  {
+    "id": "deadline-369",
+    "sourceSheet": "Prazos",
+    "sourceRowNumber": 369,
+    "processo": "1001689-70.2021.5.02.0608",
+    "dataInicial": "2026-08-06",
+    "dataFinal": "2026-08-18",
+    "dataFatal": "2026-08-18",
+    "reclamante": "BRUNO DA SILVA REQUENA BRAZ",
+    "empresa": "Grupo Casas Bahia S.A",
+    "tipoAcao": "Horas Extras e Diferença de Comissões",
+    "statusProcesso": "Execução Definitiva",
+    "faseProcesso": "Impugnação do Cálculo",
+    "tipoPrazo": "Execução",
+    "statusPrazo": "Concluído e Enviado",
+    "responsavel": "Mirelli Pires",
+    "descricao": "VER SE RECLAMADA AGRAVOU, SE NÃO, REQUERER LIBERAÇÃO ALVARÁ PARA RECEBIMENTO DE CRÉDITO",
+    "observacao": "(Sem informação)",
+    "forum": "8ª Vara do Trabalho de São Paulo - Zona Leste / SP",
+    "vara": "8º",
+    "brutoReclamante": 95245.98,
+    "verificado": null,
+    "criadoPor": "Luiz Henrique De Souza",
+    "signals": [
+      "calculation",
+      "warrant"
+    ]
+  },
+  {
+    "id": "deadline-462",
+    "sourceSheet": "Prazos",
+    "sourceRowNumber": 462,
+    "processo": "1001689-70.2021.5.02.0608",
+    "dataInicial": "2026-08-18",
+    "dataFinal": "2026-08-18",
+    "dataFatal": "2026-08-18",
+    "reclamante": "BRUNO DA SILVA REQUENA BRAZ",
+    "empresa": "Grupo Casas Bahia S.A",
+    "tipoAcao": "Horas Extras e Diferença de Comissões",
+    "statusProcesso": "Execução Definitiva",
+    "faseProcesso": "Impugnação do Cálculo",
+    "tipoPrazo": "Execução",
+    "statusPrazo": "Concluído e Enviado",
+    "responsavel": "Mirelli Pires",
+    "descricao": "Contraminutar Agravo de Petição",
+    "observacao": "(Sem informação)",
+    "forum": "8ª Vara do Trabalho de São Paulo - Zona Leste / SP",
+    "vara": "8º",
+    "brutoReclamante": 95245.98,
+    "verificado": null,
+    "criadoPor": "Mirelli Pires",
+    "signals": [
+      "calculation",
+      "appeal"
+    ]
+  },
+  {
+    "id": "deadline-1581",
+    "sourceSheet": "Prazos",
+    "sourceRowNumber": 1581,
+    "processo": "1001689-70.2021.5.02.0608",
+    "dataInicial": "2026-08-06",
+    "dataFinal": "2026-08-12",
+    "dataFatal": "2026-08-12",
+    "reclamante": "BRUNO DA SILVA REQUENA BRAZ",
+    "empresa": "Grupo Casas Bahia S.A",
+    "tipoAcao": "Horas Extras e Diferença de Comissões",
+    "statusProcesso": "Execução Definitiva",
+    "faseProcesso": "Impugnação do Cálculo",
+    "tipoPrazo": "Execução",
+    "statusPrazo": "Concluído e Enviado",
+    "responsavel": "Mirelli Pires",
+    "descricao": "Vista decisão e agravo de petição",
+    "observacao": "(Sem informação)",
+    "forum": "8ª Vara do Trabalho de São Paulo - Zona Leste / SP",
+    "vara": "8º",
+    "brutoReclamante": 95245.98,
+    "verificado": null,
+    "criadoPor": "Luiz Henrique De Souza",
+    "signals": [
+      "calculation",
+      "appeal"
+    ]
+  },
+  {
+    "id": "deadline-2917",
+    "sourceSheet": "Prazos",
+    "sourceRowNumber": 2917,
+    "processo": "1001689-70.2021.5.02.0608",
+    "dataInicial": "2026-08-06",
+    "dataFinal": "2026-08-07",
+    "dataFatal": "2026-08-12",
+    "reclamante": "BRUNO DA SILVA REQUENA BRAZ",
+    "empresa": "Grupo Casas Bahia S.A",
+    "tipoAcao": "Horas Extras e Diferença de Comissões",
+    "statusProcesso": "Execução Definitiva",
+    "faseProcesso": "Impugnação do Cálculo",
+    "tipoPrazo": "Execução",
+    "statusPrazo": "Concluído e Enviado sem Anexo",
+    "responsavel": "Arthur Malard",
+    "descricao": "Vista Cálculos Homologados",
+    "observacao": ", para manter na íntegra os cálculos anteriormente homologados.",
+    "forum": "8ª Vara do Trabalho de São Paulo - Zona Leste / SP",
+    "vara": "8º",
+    "brutoReclamante": 95245.98,
+    "verificado": null,
+    "criadoPor": "Luiz Henrique De Souza",
+    "signals": [
+      "calculation",
+      "homologation"
+    ]
+  },
+  {
+    "id": "deadline-3733",
+    "sourceSheet": "Prazos",
+    "sourceRowNumber": 3733,
+    "processo": "1001689-70.2021.5.02.0608",
+    "dataInicial": "2026-07-29",
+    "dataFinal": "2026-08-04",
+    "dataFatal": "2026-08-04",
+    "reclamante": "BRUNO DA SILVA REQUENA BRAZ",
+    "empresa": "Grupo Casas Bahia S.A",
+    "tipoAcao": "Horas Extras e Diferença de Comissões",
+    "statusProcesso": "Execução Definitiva",
+    "faseProcesso": "Impugnação do Cálculo",
+    "tipoPrazo": "Execução",
+    "statusPrazo": "Concluído e Enviado",
+    "responsavel": "Mariana Martinez",
+    "descricao": "Resposta de Embargos à execução, Impugnar Sentença de Liquidação",
+    "observacao": "já apresentamos ISL id 67e2d33 - incontroverso inferior a 30 mil",
+    "forum": "8ª Vara do Trabalho de São Paulo - Zona Leste / SP",
+    "vara": "8º",
+    "brutoReclamante": 95245.98,
+    "verificado": null,
+    "criadoPor": "Stella Marinho",
+    "signals": [
+      "calculation",
+      "appeal",
+      "incontroversial"
+    ]
+  },
+  {
+    "id": "deadline-5738",
+    "sourceSheet": "Prazos",
+    "sourceRowNumber": 5738,
+    "processo": "1001689-70.2021.5.02.0608",
+    "dataInicial": "2026-07-20",
+    "dataFinal": "2026-07-27",
+    "dataFatal": "2026-07-27",
+    "reclamante": "BRUNO DA SILVA REQUENA BRAZ",
+    "empresa": "Grupo Casas Bahia S.A",
+    "tipoAcao": "Horas Extras e Diferença de Comissões",
+    "statusProcesso": "Execução Definitiva",
+    "faseProcesso": "Impugnação do Cálculo",
+    "tipoPrazo": "Execução",
+    "statusPrazo": "Nada a Fazer",
+    "responsavel": "Felipe Dias",
+    "descricao": "VER SE A RECLAMADA EMBARGOU; SE NÃO, REQUERER LIBERAÇÃO.",
+    "observacao": "NF - incontroverso abaixo de 30mil.",
+    "forum": "8ª Vara do Trabalho de São Paulo - Zona Leste / SP",
+    "vara": "8º",
+    "brutoReclamante": 95245.98,
+    "verificado": null,
+    "criadoPor": "Luiz Henrique De Souza",
+    "signals": [
+      "calculation",
+      "warrant",
+      "incontroversial"
+    ]
+  },
+  {
+    "id": "deadline-6322",
+    "sourceSheet": "Prazos",
+    "sourceRowNumber": 6322,
+    "processo": "1001689-70.2021.5.02.0608",
+    "dataInicial": "2026-07-20",
+    "dataFinal": "2026-07-24",
+    "dataFatal": "2026-07-24",
+    "reclamante": "BRUNO DA SILVA REQUENA BRAZ",
+    "empresa": "Grupo Casas Bahia S.A",
+    "tipoAcao": "Horas Extras e Diferença de Comissões",
+    "statusProcesso": "Execução Definitiva",
+    "faseProcesso": "Impugnação do Cálculo",
+    "tipoPrazo": "Execução",
+    "statusPrazo": "Concluído e Enviado",
+    "responsavel": "Mariana Martinez",
+    "descricao": "Ver se tem impugnação à sentença de liquidação",
+    "observacao": "(Sem informação)",
+    "forum": "8ª Vara do Trabalho de São Paulo - Zona Leste / SP",
+    "vara": "8º",
+    "brutoReclamante": 95245.98,
+    "verificado": null,
+    "criadoPor": "Luiz Henrique De Souza",
+    "signals": [
+      "calculation"
+    ]
+  }
+];
+
+export function toProcessSlug(processNumber: string) {
+  return processNumber.replace(/\D/g, "");
+}
+
+export function getPilotCase(processNumberOrSlug: string) {
+  return (
+    pilotCases.find(
+      (pilotCase) =>
+        pilotCase.processNumber === processNumberOrSlug ||
+        toProcessSlug(pilotCase.processNumber) === processNumberOrSlug,
+    ) ?? null
+  );
+}
+
+export function getPjeReferences(processNumberOrSlug: string) {
+  const pilotCase = getPilotCase(processNumberOrSlug);
+  const processNumber = pilotCase?.processNumber ?? processNumberOrSlug;
+  return pjeReferences.filter((reference) => reference.processNumber === processNumber);
+}
+
+export function getProcessDeadlines(processNumberOrSlug: string) {
+  const pilotCase = getPilotCase(processNumberOrSlug);
+  const processNumber = pilotCase?.processNumber ?? processNumberOrSlug;
+  return processDeadlines.filter((deadline) => deadline.processo === processNumber);
+}

@@ -103,4 +103,9 @@ export async function requireUser(options: { allowTemporary?: boolean } = {}) {
     redirect("/login");
   }
 
-  if (user.mustChangeP
+  if (user.mustChangePassword && !options.allowTemporary) {
+    redirect("/trocar-chave");
+  }
+
+  return user;
+}

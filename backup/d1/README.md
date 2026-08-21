@@ -8,4 +8,4 @@ mantida somente em cofre/backup privado e usada por caminho externo com
 - `data.sql`: restauração D1 legada, deliberadamente ignorada pelo Git.
 
 Tokens OpenClaw antigos não são importados. Credenciais de usuário restauradas exigem
-troca e devem ser substituídas antes da liberação do sistem
+troca e devem ser substituídas antes da liberação do sistema.

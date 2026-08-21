@@ -140,4 +140,8 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (dispatchResult.status === "failed" && dispatchResult.failureMessage) {
     await markAiAnalysisRunFailed(run.id, dispatchResult.failureMessage);
-    return redirec
+    return redirectTo(request, `${processPath}?analysis=failed`);
+  }
+
+  return redirectTo(request, `${processPath}?analysis=queued`);
+}

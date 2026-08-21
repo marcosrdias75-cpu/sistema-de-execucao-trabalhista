@@ -36,4 +36,7 @@ export default async function ChangeKeyPage(props: ChangeKeyPageProps) {
             nextPath={nextPath}
           />
         </div>
-   
+      </section>
+    </main>
+  );
+}

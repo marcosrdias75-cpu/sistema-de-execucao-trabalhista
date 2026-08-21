@@ -81,4 +81,8 @@ export async function POST(request: Request, context: RouteContext) {
   await persistStructuredAnalysis({
     aiRunId: run.id,
     payload: resultPayload,
-    processNumbe
+    processNumber: run.processNumber,
+  });
+
+  return NextResponse.json({ ok: true });
+}

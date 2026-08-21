@@ -68,4 +68,6 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     mustChangePassword: Boolean(user.must_change_password),
-    redirectTo: user.must_change
+    redirectTo: user.must_change_password ? withNext("/trocar-chave", nextPath) : nextPath,
+  });
+}

@@ -41,3 +41,7 @@ export default async function LoginPage(props: LoginPageProps) {
         <div className="mt-5">
           <LoginForm initialError={errorCode ? loginErrors[errorCode] : null} nextPath={nextPath} />
         </div>
+      </section>
+    </main>
+  );
+}

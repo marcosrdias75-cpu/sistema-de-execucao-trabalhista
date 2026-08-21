@@ -188,4 +188,14 @@ export default async function OpenClawSettingsPage(props: OpenClawSettingsPagePr
                   </article>
                 ))
               ) : (
-                <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                  Configure URL e token antes de testar.
+                </p>
+              )}
+            </div>
+          </section>
+        ) : null}
+      </div>
+    </main>
+  );
+}
